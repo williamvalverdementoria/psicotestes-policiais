@@ -41,11 +41,6 @@ export function Exercicio() {
     })
   }, [id])
 
-  // If quiz type, render QuizExercicio component
-  if (exercicio?.tipo === 'quiz') {
-    return <QuizExercicio exercicio={exercicio} />
-  }
-
   function generateGrid(ex: ExercicioType) {
     const config = ex.config_json as Record<string, unknown>
     const gridConf = config.grid as { linhas: number; colunas: number } || { linhas: 10, colunas: 15 }
@@ -147,6 +142,11 @@ export function Exercicio() {
 
   const minutes = Math.floor(timeLeft / 60)
   const seconds = timeLeft % 60
+
+  // If quiz type, render QuizExercicio component
+  if (exercicio?.tipo === 'quiz') {
+    return <QuizExercicio exercicio={exercicio} />
+  }
 
   if (!exercicio) {
     return (
