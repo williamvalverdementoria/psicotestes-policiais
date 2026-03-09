@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Shield, Clock, Target, Eye, Brain, Lightbulb, User, Check, X, ChevronRight } from 'lucide-react'
+import { Shield, Clock, Target, Eye, Brain, Lightbulb, User, Check, X, ChevronRight, Sparkles } from 'lucide-react'
 import { Navbar } from '@/components/layout/Navbar'
 import { supabase } from '@/lib/supabase'
 import type { Concurso } from '@/types/database'
 
 const constructos = [
-  { nome: 'Personalidade', desc: 'Traços comportamentais e perfil psicológico', icon: User, color: 'bg-purple-100 text-purple-600' },
-  { nome: 'Atenção Concentrada', desc: 'Foco em um único estímulo por vez', icon: Eye, color: 'bg-blue-100 text-blue-600' },
-  { nome: 'Atenção Dividida', desc: 'Processar múltiplos estímulos simultaneamente', icon: Target, color: 'bg-teal-100 text-teal-600' },
-  { nome: 'Memória', desc: 'Retenção e recuperação de informações', icon: Lightbulb, color: 'bg-amber-100 text-amber-600' },
-  { nome: 'Raciocínio Lógico', desc: 'Resolução de problemas e análise', icon: Brain, color: 'bg-rose-100 text-rose-600' },
+  { nome: 'Personalidade', desc: 'Traços comportamentais e perfil psicológico', icon: User, color: 'bg-purple-50 text-purple-600' },
+  { nome: 'Atenção Concentrada', desc: 'Foco em um único estímulo por vez', icon: Eye, color: 'bg-blue-50 text-blue-600' },
+  { nome: 'Atenção Dividida', desc: 'Processar múltiplos estímulos simultaneamente', icon: Target, color: 'bg-teal-50 text-teal-600' },
+  { nome: 'Memória', desc: 'Retenção e recuperação de informações', icon: Lightbulb, color: 'bg-amber-50 text-amber-600' },
+  { nome: 'Raciocínio Lógico', desc: 'Resolução de problemas e análise', icon: Brain, color: 'bg-rose-50 text-rose-600' },
 ]
 
 export function Landing() {
@@ -27,20 +27,21 @@ export function Landing() {
       <Navbar />
 
       {/* HERO */}
-      <section className="relative bg-primary min-h-screen flex items-center overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary via-primary to-primary-dark min-h-screen flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-accent/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-accent/8 rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]" />
+          <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] bg-purple-500/5 rounded-full blur-[80px]" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-40">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm font-medium mb-6">
-              <Check className="w-4 h-4" />
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm font-semibold mb-8">
+              <Sparkles className="w-4 h-4" />
               Aprovado por psicólogo especialista
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold text-white leading-[1.1] mb-7 tracking-tight">
               Prepare-se para o{' '}
-              <span className="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
+              <span className="text-gradient">
                 Psicotécnico
               </span>{' '}
               do seu Concurso Policial
@@ -49,21 +50,15 @@ export function Landing() {
               Treine com exercícios cronometrados personalizados para o seu edital. Criado por psicólogo especialista em avaliações psicológicas para concursos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                to="/signup"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-accent hover:bg-accent-dark rounded-xl transition-colors shadow-lg shadow-accent/25"
-              >
+              <Link to="/signup" className="btn-primary !px-8 !py-4 !text-base shadow-xl shadow-accent/20">
                 Comece seu treino grátis
                 <ChevronRight className="w-5 h-5" />
               </Link>
-              <a
-                href="#como-funciona"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-gray-300 border border-gray-600 hover:border-gray-400 hover:text-white rounded-xl transition-colors"
-              >
+              <a href="#como-funciona" className="btn-ghost !text-gray-300 !border !border-gray-600 hover:!border-gray-400 hover:!text-white !px-8 !py-4 !text-base">
                 Como funciona
               </a>
             </div>
-            <div className="mt-12 flex items-center gap-8 text-sm text-gray-500">
+            <div className="mt-14 flex items-center gap-8 text-sm text-gray-500">
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-success" />
                 Sem cartão de crédito
@@ -78,26 +73,26 @@ export function Landing() {
       </section>
 
       {/* PROBLEMA */}
-      <section className="py-20 md:py-28 bg-white">
+      <section className="section-padding bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4 tracking-tight">
               Mais de 30% dos candidatos são eliminados na avaliação psicológica
             </h2>
             <p className="text-lg text-gray-500">Não seja um deles. A preparação adequada faz toda a diferença.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { value: '30%+', label: 'Candidatos eliminados no psicotécnico', bg: 'bg-red-50 border-red-100', text: 'text-red-600', iconBg: 'bg-red-100', iconColor: 'text-red-500' },
-              { value: '2ª fase', label: 'Onde a maioria é eliminada sem preparação', bg: 'bg-amber-50 border-amber-100', text: 'text-amber-600', iconBg: 'bg-amber-100', iconColor: 'text-amber-500' },
-              { value: '95%', label: 'Taxa de aprovação com treino adequado', bg: 'bg-emerald-50 border-emerald-100', text: 'text-emerald-600', iconBg: 'bg-emerald-100', iconColor: 'text-emerald-500' },
+              { value: '30%+', label: 'Candidatos eliminados no psicotécnico', bg: 'bg-red-50', border: 'border-red-100', text: 'text-red-600', iconColor: 'text-red-500' },
+              { value: '2ª fase', label: 'Onde a maioria é eliminada sem preparação', bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-600', iconColor: 'text-amber-500' },
+              { value: '95%', label: 'Taxa de aprovação com treino adequado', bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-600', iconColor: 'text-emerald-500' },
             ].map(stat => (
-              <div key={stat.value} className={`text-center p-8 rounded-2xl ${stat.bg} border`}>
-                <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl ${stat.iconBg} flex items-center justify-center`}>
-                  <Shield className={`w-8 h-8 ${stat.iconColor}`} />
+              <div key={stat.value} className={`text-center p-8 rounded-2xl ${stat.bg} border ${stat.border} hover:-translate-y-1 transition-all duration-300`}>
+                <div className={`w-14 h-14 mx-auto mb-4 rounded-2xl bg-white/60 flex items-center justify-center`}>
+                  <Shield className={`w-7 h-7 ${stat.iconColor}`} />
                 </div>
                 <div className={`text-4xl font-extrabold ${stat.text} mb-2`}>{stat.value}</div>
-                <p className="text-gray-600 font-medium">{stat.label}</p>
+                <p className="text-gray-600 font-medium text-sm">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -105,24 +100,24 @@ export function Landing() {
       </section>
 
       {/* COMO FUNCIONA */}
-      <section id="como-funciona" className="py-20 md:py-28 bg-surface">
+      <section id="como-funciona" className="section-padding bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4">Como funciona</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4 tracking-tight">Como funciona</h2>
             <p className="text-lg text-gray-500">Três passos simples para sua aprovação</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {[
               { step: '1', title: 'Escolha seu concurso', desc: 'Selecione entre PCES, PMES e outros concursos policiais. O conteúdo é adaptado ao edital específico.' },
               { step: '2', title: 'Faça o diagnóstico', desc: 'Descubra seus pontos fortes e fracos em cada constructo avaliado. O sistema identifica onde melhorar.' },
               { step: '3', title: 'Treine diariamente', desc: 'Exercícios cronometrados com dificuldade progressiva. Acompanhe sua evolução com relatórios.' },
             ].map(item => (
-              <div key={item.step} className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:-translate-y-1 hover:shadow-lg transition-all">
-                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-6">
+              <div key={item.step} className="card-elevated p-8">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 flex items-center justify-center mb-6">
                   <span className="text-xl font-extrabold text-accent">{item.step}</span>
                 </div>
-                <h3 className="text-xl font-bold text-primary mb-3">{item.title}</h3>
-                <p className="text-gray-500 leading-relaxed">{item.desc}</p>
+                <h3 className="text-xl font-extrabold text-primary mb-3 tracking-tight">{item.title}</h3>
+                <p className="text-gray-500 leading-relaxed text-sm">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -130,33 +125,31 @@ export function Landing() {
       </section>
 
       {/* CONCURSOS */}
-      <section id="concursos" className="py-20 md:py-28 bg-white">
+      <section id="concursos" className="section-padding bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4">Concursos disponíveis</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4 tracking-tight">Concursos disponíveis</h2>
             <p className="text-lg text-gray-500">Conteúdo personalizado para cada edital</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {concursos.map(c => (
               <div
                 key={c.id}
-                className={`rounded-2xl p-6 hover:-translate-y-1 hover:shadow-lg transition-all ${
+                className={`rounded-2xl p-6 transition-all duration-300 ${
                   c.ativo
-                    ? 'bg-white border-2 border-accent shadow-sm'
-                    : 'bg-white border border-gray-200 opacity-70'
+                    ? 'card-elevated border-2 !border-accent/30 hover:-translate-y-1'
+                    : 'bg-gray-50 border border-gray-200 opacity-60'
                 }`}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${c.ativo ? 'bg-accent/10' : 'bg-gray-100'}`}>
-                    <Shield className={`w-6 h-6 ${c.ativo ? 'text-accent' : 'text-gray-400'}`} />
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${c.ativo ? 'bg-accent/10' : 'bg-gray-100'}`}>
+                    <Shield className={`w-5 h-5 ${c.ativo ? 'text-accent' : 'text-gray-400'}`} />
                   </div>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                    c.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
-                  }`}>
+                  <span className={`badge ${c.ativo ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'}`}>
                     {c.ativo ? 'Disponível' : 'Em breve'}
                   </span>
                 </div>
-                <h3 className={`text-lg font-bold mb-1 ${c.ativo ? 'text-primary' : 'text-gray-700'}`}>{c.sigla}</h3>
+                <h3 className={`text-lg font-extrabold mb-1 ${c.ativo ? 'text-primary' : 'text-gray-700'}`}>{c.sigla}</h3>
                 <p className={`text-sm ${c.ativo ? 'text-gray-500' : 'text-gray-400'}`}>{c.nome}</p>
               </div>
             ))}
@@ -165,20 +158,20 @@ export function Landing() {
       </section>
 
       {/* CONSTRUCTOS */}
-      <section className="py-20 md:py-28 bg-surface">
+      <section className="section-padding bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4">O que treinamos</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4 tracking-tight">O que treinamos</h2>
             <p className="text-lg text-gray-500">Constructos avaliados nos concursos policiais</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
             {constructos.map(c => (
-              <div key={c.nome} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:-translate-y-1 hover:shadow-lg transition-all text-center">
+              <div key={c.nome} className="card-elevated p-6 text-center">
                 <div className={`w-14 h-14 mx-auto mb-4 rounded-2xl ${c.color} flex items-center justify-center`}>
                   <c.icon className="w-7 h-7" />
                 </div>
-                <h3 className="font-bold text-primary mb-2">{c.nome}</h3>
-                <p className="text-sm text-gray-500">{c.desc}</p>
+                <h3 className="font-bold text-primary mb-2 text-sm">{c.nome}</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">{c.desc}</p>
               </div>
             ))}
           </div>
@@ -186,21 +179,20 @@ export function Landing() {
       </section>
 
       {/* CREDIBILIDADE */}
-      <section className="py-20 md:py-28 bg-white">
+      <section className="section-padding bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
+            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
               <User className="w-12 h-12 text-primary" />
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4">Criado por especialista</h2>
-            <p className="text-xl text-gray-700 font-semibold mb-2">William Valverde — Psicólogo</p>
-            <p className="text-lg text-gray-500 leading-relaxed mb-8">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4 tracking-tight">Criado por especialista</h2>
+            <p className="text-xl text-gray-700 font-bold mb-2">William Valverde — Psicólogo</p>
+            <p className="text-base text-gray-500 leading-relaxed mb-8 max-w-xl mx-auto">
               Conteúdo baseado em referências SATEPSI e bibliografias oficiais dos concursos policiais.
-              Exercícios desenvolvidos seguindo os parâmetros técnicos das avaliações psicológicas.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap justify-center gap-3">
               {['Referências SATEPSI', 'Bibliografias oficiais', 'Parâmetros técnicos CFP'].map(badge => (
-                <span key={badge} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium">
+                <span key={badge} className="badge bg-accent/10 text-accent text-sm py-2 px-4">
                   <Check className="w-4 h-4" />
                   {badge}
                 </span>
@@ -211,22 +203,22 @@ export function Landing() {
       </section>
 
       {/* PRICING */}
-      <section id="precos" className="py-20 md:py-28 bg-surface">
+      <section id="precos" className="section-padding bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4">Planos e preços</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-4 tracking-tight">Planos e preços</h2>
             <p className="text-lg text-gray-500">Escolha o plano ideal para sua preparação</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {/* Gratuito */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200 hover:-translate-y-1 hover:shadow-lg transition-all flex flex-col">
+            <div className="card-elevated p-8 flex flex-col">
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-primary mb-1">Gratuito</h3>
+                <h3 className="text-lg font-extrabold text-primary mb-1">Gratuito</h3>
                 <p className="text-sm text-gray-500">Para começar a treinar</p>
               </div>
               <div className="mb-6">
                 <span className="text-4xl font-extrabold text-primary">R$0</span>
-                <span className="text-gray-500 text-sm">/para sempre</span>
+                <span className="text-gray-400 text-sm ml-1">/para sempre</span>
               </div>
               <ul className="space-y-3 mb-8 flex-1">
                 {['1 concurso disponível', '3 exercícios por dia', 'Exercícios nível 1-2'].map(f => (
@@ -240,28 +232,28 @@ export function Landing() {
                   Relatórios avançados
                 </li>
               </ul>
-              <Link to="/signup" className="w-full text-center px-6 py-3 text-sm font-bold text-accent border-2 border-accent hover:bg-accent hover:text-white rounded-xl transition-colors">
+              <Link to="/signup" className="btn-secondary w-full !text-accent !border-accent hover:!bg-accent hover:!text-white">
                 Começar grátis
               </Link>
             </div>
 
             {/* Assinatura */}
-            <div className="relative bg-gradient-to-b from-primary to-primary-light border-2 border-accent rounded-2xl p-8 shadow-xl hover:-translate-y-1 transition-all flex flex-col">
+            <div className="relative bg-gradient-to-b from-primary to-primary-dark border-2 border-accent rounded-2xl p-8 shadow-2xl shadow-accent/10 flex flex-col scale-[1.02]">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-accent text-white text-xs font-bold shadow-lg shadow-accent/25">
+                <span className="badge bg-accent text-white shadow-lg shadow-accent/25 py-1.5 px-5">
                   Mais popular
                 </span>
               </div>
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-white mb-1">Assinatura</h3>
+                <h3 className="text-lg font-extrabold text-white mb-1">Assinatura</h3>
                 <p className="text-sm text-gray-400">Acesso completo</p>
               </div>
               <div className="mb-2">
                 <span className="text-4xl font-extrabold text-white">R$39,90</span>
-                <span className="text-gray-400 text-sm">/mês</span>
+                <span className="text-gray-400 text-sm ml-1">/mês</span>
               </div>
-              <p className="text-sm text-accent mb-6">
-                ou R$297,00/ano <span className="text-xs bg-accent/20 px-2 py-0.5 rounded-full ml-1">-38%</span>
+              <p className="text-sm text-accent mb-6 font-medium">
+                ou R$297,00/ano <span className="badge bg-accent/20 text-accent ml-1">-38%</span>
               </p>
               <ul className="space-y-3 mb-8 flex-1">
                 {['Todos os concursos', 'Exercícios ilimitados', 'Todos os níveis de dificuldade', 'Relatórios detalhados', 'Plano de treino personalizado'].map(f => (
@@ -271,15 +263,15 @@ export function Landing() {
                   </li>
                 ))}
               </ul>
-              <Link to="/signup" className="w-full text-center px-6 py-3 text-sm font-bold text-white bg-accent hover:bg-accent-dark rounded-xl transition-colors shadow-lg shadow-accent/25">
+              <Link to="/signup" className="btn-primary w-full shadow-xl shadow-accent/20">
                 Assinar agora
               </Link>
             </div>
 
             {/* Avulso */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200 hover:-translate-y-1 hover:shadow-lg transition-all flex flex-col">
+            <div className="card-elevated p-8 flex flex-col">
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-primary mb-1">Avulso</h3>
+                <h3 className="text-lg font-extrabold text-primary mb-1">Avulso</h3>
                 <p className="text-sm text-gray-500">Pague por concurso</p>
               </div>
               <div className="mb-2">
@@ -295,7 +287,7 @@ export function Landing() {
                   </li>
                 ))}
               </ul>
-              <Link to="/signup" className="w-full text-center px-6 py-3 text-sm font-bold text-accent border-2 border-accent hover:bg-accent hover:text-white rounded-xl transition-colors">
+              <Link to="/signup" className="btn-secondary w-full !text-accent !border-accent hover:!bg-accent hover:!text-white">
                 Comprar acesso
               </Link>
             </div>
@@ -303,25 +295,44 @@ export function Landing() {
         </div>
       </section>
 
+      {/* CTA Final */}
+      <section className="section-padding bg-gradient-to-br from-primary via-primary to-primary-dark relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[150px]" />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 tracking-tight">
+            Comece a treinar agora
+          </h2>
+          <p className="text-lg text-gray-400 mb-8">
+            Não espere até a véspera da prova. Comece hoje e aumente suas chances de aprovação.
+          </p>
+          <Link to="/signup" className="btn-primary !px-10 !py-4 !text-base shadow-2xl shadow-accent/30">
+            Criar conta grátis
+            <ChevronRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
       {/* FOOTER */}
-      <footer className="bg-primary py-12">
+      <footer className="bg-primary-dark py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-accent rounded-lg flex items-center justify-center">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-gradient-to-br from-accent to-accent-dark rounded-lg flex items-center justify-center">
                 <Clock className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold text-white">Psicotestes Policiais</span>
+              <span className="font-extrabold text-white">Psicotestes Policiais</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-400">
-              <a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a>
-              <a href="#concursos" className="hover:text-white transition-colors">Concursos</a>
-              <a href="#precos" className="hover:text-white transition-colors">Preços</a>
-              <Link to="/login" className="hover:text-white transition-colors">Entrar</Link>
+              <a href="#como-funciona" className="hover:text-white transition-colors duration-200">Como funciona</a>
+              <a href="#concursos" className="hover:text-white transition-colors duration-200">Concursos</a>
+              <a href="#precos" className="hover:text-white transition-colors duration-200">Preços</a>
+              <Link to="/login" className="hover:text-white transition-colors duration-200">Entrar</Link>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-700 text-center text-sm text-gray-500">
-            &copy; 2026 Psicotestes Policiais. Todos os direitos reservados.
+          <div className="mt-8 pt-8 border-t border-white/10 text-center">
+            <p className="text-xs text-gray-500">© {new Date().getFullYear()} Psicotestes Policiais. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>

@@ -13,25 +13,25 @@ export function Navbar() {
   }, [])
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-primary/95 backdrop-blur-xl shadow-lg' : ''}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-primary/90 backdrop-blur-2xl shadow-xl shadow-black/10' : ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-gradient-to-br from-accent to-accent-dark rounded-xl flex items-center justify-center shadow-lg shadow-accent/20">
               <Clock className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold text-white">Psicotestes</span>
+            <span className="text-lg font-extrabold text-white tracking-tight">Psicotestes</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <a href="#como-funciona" className="text-sm text-gray-300 hover:text-white transition-colors">Como funciona</a>
-            <a href="#concursos" className="text-sm text-gray-300 hover:text-white transition-colors">Concursos</a>
-            <a href="#precos" className="text-sm text-gray-300 hover:text-white transition-colors">Preços</a>
+            <a href="#como-funciona" className="text-sm text-gray-300 hover:text-white transition-colors duration-200">Como funciona</a>
+            <a href="#concursos" className="text-sm text-gray-300 hover:text-white transition-colors duration-200">Concursos</a>
+            <a href="#precos" className="text-sm text-gray-300 hover:text-white transition-colors duration-200">Preços</a>
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Link to="/login" className="text-sm text-gray-300 hover:text-white transition-colors">Entrar</Link>
-            <Link to="/signup" className="px-4 py-2 text-sm font-semibold text-white bg-accent hover:bg-accent-dark rounded-lg transition-colors">
+            <Link to="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200 px-4 py-2">Entrar</Link>
+            <Link to="/signup" className="btn-primary text-sm !py-2.5 !px-5">
               Começar grátis
             </Link>
           </div>
@@ -42,14 +42,16 @@ export function Navbar() {
         </div>
 
         {mobileOpen && (
-          <div className="md:hidden pb-4 space-y-3">
-            <a href="#como-funciona" className="block text-sm text-gray-300 hover:text-white py-2" onClick={() => setMobileOpen(false)}>Como funciona</a>
-            <a href="#concursos" className="block text-sm text-gray-300 hover:text-white py-2" onClick={() => setMobileOpen(false)}>Concursos</a>
-            <a href="#precos" className="block text-sm text-gray-300 hover:text-white py-2" onClick={() => setMobileOpen(false)}>Preços</a>
-            <Link to="/login" className="block text-sm text-gray-300 hover:text-white py-2" onClick={() => setMobileOpen(false)}>Entrar</Link>
-            <Link to="/signup" className="block w-full text-center px-4 py-2 text-sm font-semibold text-white bg-accent rounded-lg" onClick={() => setMobileOpen(false)}>
-              Começar grátis
-            </Link>
+          <div className="md:hidden pb-6 pt-2 space-y-1 animate-in slide-in-from-top-2">
+            <a href="#como-funciona" className="block text-sm text-gray-300 hover:text-white px-3 py-2.5 rounded-lg hover:bg-white/5 transition-all" onClick={() => setMobileOpen(false)}>Como funciona</a>
+            <a href="#concursos" className="block text-sm text-gray-300 hover:text-white px-3 py-2.5 rounded-lg hover:bg-white/5 transition-all" onClick={() => setMobileOpen(false)}>Concursos</a>
+            <a href="#precos" className="block text-sm text-gray-300 hover:text-white px-3 py-2.5 rounded-lg hover:bg-white/5 transition-all" onClick={() => setMobileOpen(false)}>Preços</a>
+            <div className="pt-3 mt-3 border-t border-white/10 space-y-2">
+              <Link to="/login" className="block text-sm text-gray-300 hover:text-white px-3 py-2.5 rounded-lg hover:bg-white/5 transition-all" onClick={() => setMobileOpen(false)}>Entrar</Link>
+              <Link to="/signup" className="block w-full text-center btn-primary" onClick={() => setMobileOpen(false)}>
+                Começar grátis
+              </Link>
+            </div>
           </div>
         )}
       </div>

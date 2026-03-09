@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Shield, ArrowRight, Check } from 'lucide-react'
+import { Shield, ArrowRight, Check, Sparkles } from 'lucide-react'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
@@ -27,22 +27,12 @@ export function Onboarding() {
 
   async function selectConcurso(concurso: Concurso) {
     setSelectedConcurso(concurso)
-    // Load constructos for this concurso
-    const { data: cc } = await supabase
-      .from('concurso_constructos')
-      .select('constructo_id')
-      .eq('concurso_id', concurso.id)
-      .order('prioridade')
+    const { data: cc } = await supabase.from('concurso_constructos').select('constructo_id').eq('concurso_id', concurso.id).order('prioridade')
 
     if (cc) {
       const ids = cc.map(c => c.constructo_id)
-      const { data: cts } = await supabase
-        .from('constructos')
-        .select('*')
-        .in('id', ids)
-
+      const { data: cts } = await supabase.from('constructos').select('*').in('id', ids)
       if (cts) {
-        // Sort by priority
         const sorted = ids.map(id => cts.find(c => c.id === id)).filter(Boolean) as Constructo[]
         setConstructos(sorted)
       }
@@ -58,7 +48,6 @@ export function Onboarding() {
     newScores.set(constructo.id, score)
     setScores(newScores)
 
-    // Save diagnostic
     await supabase.from('diagnosticos').insert({
       user_id: user.id,
       concurso_id: selectedConcurso.id,
@@ -70,7 +59,6 @@ export function Onboarding() {
     if (currentConstructoIndex < constructos.length - 1) {
       setCurrentConstructoIndex(currentConstructoIndex + 1)
     } else {
-      // All done — create plano
       setLoading(true)
       const avgScore = Array.from(newScores.values()).reduce((a, b) => a + b, 0) / newScores.size
       const nivel = avgScore >= 70 ? 3 : avgScore >= 40 ? 2 : 1
@@ -88,29 +76,28 @@ export function Onboarding() {
     }
   }
 
-  // Simple diagnostic exercise: rate 1-100 simulation
   function DiagnosticExercise() {
     const constructo = constructos[currentConstructoIndex]
     const [answer, setAnswer] = useState(50)
 
     return (
       <div className="max-w-lg mx-auto text-center">
-        <div className="mb-4">
-          <span className="text-sm text-gray-400">
+        <div className="mb-6">
+          <span className="text-sm text-gray-400 font-medium">
             Constructo {currentConstructoIndex + 1} de {constructos.length}
           </span>
-          <div className="w-full h-2 bg-gray-100 rounded-full mt-2 overflow-hidden">
+          <div className="w-full h-2.5 bg-gray-100 rounded-full mt-3 overflow-hidden">
             <div
-              className="h-full bg-accent rounded-full transition-all"
+              className="h-full bg-gradient-to-r from-accent to-accent-light rounded-full transition-all duration-500"
               style={{ width: `${((currentConstructoIndex + 1) / constructos.length) * 100}%` }}
             />
           </div>
         </div>
 
-        <h2 className="text-xl font-bold text-primary mb-2">{constructo.nome}</h2>
+        <h2 className="text-xl font-extrabold text-primary mb-2 tracking-tight">{constructo.nome}</h2>
         <p className="text-sm text-gray-500 mb-8">{constructo.descricao}</p>
 
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <div className="card-elevated p-8">
           <p className="text-sm text-gray-600 mb-6">
             Como você avalia sua habilidade neste constructo? (Exercício simplificado para diagnóstico)
           </p>
@@ -123,11 +110,11 @@ export function Onboarding() {
             onChange={e => setAnswer(Number(e.target.value))}
             className="w-full mb-4 accent-accent"
           />
-          <p className="text-2xl font-bold text-primary mb-6">{answer}/100</p>
+          <p className="text-3xl font-extrabold text-primary mb-6">{answer}<span className="text-lg text-gray-400">/100</span></p>
 
           <button
             onClick={() => submitDiagnosticScore(answer)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent-dark transition-colors"
+            className="btn-primary"
           >
             {currentConstructoIndex < constructos.length - 1 ? 'Próximo' : 'Finalizar'}
             <ArrowRight className="w-5 h-5" />
@@ -145,29 +132,32 @@ export function Onboarding() {
 
     return (
       <div className="max-w-lg mx-auto text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-success/10 flex items-center justify-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-success/10 flex items-center justify-center">
           <Check className="w-8 h-8 text-success" />
         </div>
-        <h2 className="text-2xl font-bold text-primary mb-2">Diagnóstico completo!</h2>
+        <h2 className="text-2xl font-extrabold text-primary mb-2 tracking-tight">Diagnóstico completo!</h2>
         <p className="text-gray-500 mb-8">Seu plano personalizado foi criado.</p>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+        <div className="card-elevated p-6 mb-8">
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData}>
-                <PolarGrid stroke="#e5e7eb" />
-                <PolarAngleAxis dataKey="constructo" tick={{ fontSize: 11, fill: '#6b7280' }} />
+                <PolarGrid stroke="#e5e7eb" strokeDasharray="3 3" />
+                <PolarAngleAxis dataKey="constructo" tick={{ fontSize: 11, fill: '#6b7280', fontWeight: 500 }} />
                 <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10 }} />
-                <Radar dataKey="score" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.2} strokeWidth={2} />
+                <Radar dataKey="score" stroke="#3b82f6" fill="url(#radarGradientOnboarding)" strokeWidth={2.5} />
+                <defs>
+                  <linearGradient id="radarGradientOnboarding" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
               </RadarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:bg-accent-dark transition-colors shadow-lg shadow-accent/25"
-        >
+        <button onClick={() => navigate('/dashboard')} className="btn-primary !px-8 !py-4 shadow-xl shadow-accent/20">
           Ver meu plano
           <ArrowRight className="w-5 h-5" />
         </button>
@@ -180,23 +170,26 @@ export function Onboarding() {
       <div className="w-full max-w-2xl">
         {step === 'select-concurso' && (
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-primary mb-2">Para qual concurso você está se preparando?</h1>
+            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-accent/10 flex items-center justify-center">
+              <Sparkles className="w-8 h-8 text-accent" />
+            </div>
+            <h1 className="text-2xl font-extrabold text-primary mb-2 tracking-tight">Para qual concurso você está se preparando?</h1>
             <p className="text-gray-500 mb-8">Selecione o concurso para personalizar seu plano de treino.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {concursos.map(c => (
                 <button
                   key={c.id}
                   onClick={() => selectConcurso(c)}
-                  className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-accent shadow-sm hover:shadow-lg transition-all text-left"
+                  className="card-elevated p-6 text-left hover:-translate-y-1"
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
                       <Shield className="w-5 h-5 text-accent" />
                     </div>
-                    <span className="text-lg font-bold text-primary">{c.sigla}</span>
+                    <span className="text-lg font-extrabold text-primary">{c.sigla}</span>
                   </div>
                   <p className="text-sm text-gray-500">{c.nome}</p>
-                  {c.banca && <p className="text-xs text-gray-400 mt-1">Banca: {c.banca}</p>}
+                  {c.banca && <p className="text-xs text-gray-400 mt-1 font-medium">Banca: {c.banca}</p>}
                 </button>
               ))}
             </div>
@@ -205,20 +198,17 @@ export function Onboarding() {
 
         {step === 'intro' && selectedConcurso && (
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-accent/10 flex items-center justify-center">
               <Shield className="w-8 h-8 text-accent" />
             </div>
-            <h1 className="text-2xl font-bold text-primary mb-2">Vamos descobrir seu nível atual</h1>
-            <p className="text-gray-500 mb-2">
-              Concurso selecionado: <strong>{selectedConcurso.sigla}</strong>
+            <h1 className="text-2xl font-extrabold text-primary mb-2 tracking-tight">Vamos descobrir seu nível atual</h1>
+            <p className="text-gray-500 mb-2 font-medium">
+              Concurso selecionado: <strong className="text-primary">{selectedConcurso.sigla}</strong>
             </p>
             <p className="text-gray-400 text-sm mb-8">
               Faremos um exercício rápido para cada constructo avaliado. Leva cerca de 5 minutos.
             </p>
-            <button
-              onClick={() => setStep('diagnostic')}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:bg-accent-dark transition-colors shadow-lg shadow-accent/25"
-            >
+            <button onClick={() => setStep('diagnostic')} className="btn-primary !px-8 !py-4 shadow-xl shadow-accent/20">
               Iniciar Diagnóstico
               <ArrowRight className="w-5 h-5" />
             </button>
@@ -231,8 +221,8 @@ export function Onboarding() {
 
         {loading && (
           <div className="text-center py-20">
-            <div className="w-8 h-8 mx-auto border-4 border-accent border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-gray-500">Criando seu plano personalizado...</p>
+            <div className="spinner mx-auto mb-4" />
+            <p className="text-gray-500 font-medium">Criando seu plano personalizado...</p>
           </div>
         )}
       </div>
