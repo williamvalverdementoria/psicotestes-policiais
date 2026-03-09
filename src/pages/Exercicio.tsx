@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Pause, Play, X } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
+import { QuizExercicio } from '@/components/QuizExercicio'
 import type { Exercicio as ExercicioType } from '@/types/database'
 
 interface GridCell {
@@ -33,10 +34,17 @@ export function Exercicio() {
       if (data) {
         setExercicio(data)
         setTimeLeft(data.tempo_limite)
-        generateGrid(data)
+        if (data.tipo !== 'quiz') {
+          generateGrid(data)
+        }
       }
     })
   }, [id])
+
+  // If quiz type, render QuizExercicio component
+  if (exercicio?.tipo === 'quiz') {
+    return <QuizExercicio exercicio={exercicio} />
+  }
 
   function generateGrid(ex: ExercicioType) {
     const config = ex.config_json as Record<string, unknown>
