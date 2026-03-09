@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Pause, Play, X } from 'lucide-react'
+import { Pause, Play, X, Clock, Target, AlertTriangle, ChevronDown } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { QuizExercicio } from '@/components/QuizExercicio'
@@ -157,43 +157,107 @@ export function Exercicio() {
   }
 
   if (!started) {
+    const instrucoes = exercicio.instrucoes || ''
+    const paragraphs = instrucoes.split('\n').filter((p: string) => p.trim())
+    const config = exercicio.config_json as Record<string, unknown>
+    const targetSymbol = (config?.simbolo_alvo as string) || (config?.alvo as string) || '◆'
+
     return (
-      <div className="min-h-screen bg-primary flex items-center justify-center px-4">
-        <div className="max-w-lg text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">{exercicio.titulo}</h1>
-          <p className="text-gray-400 mb-8">{exercicio.instrucoes}</p>
+      <div className="min-h-screen bg-primary">
+        {/* Header */}
+        <div className="bg-primary-dark border-b border-white/10">
+          <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border text-blue-400 bg-blue-500/20 border-blue-500/30">
+              <Target className="w-3.5 h-3.5" />
+              Atenção
+            </span>
+          </div>
+        </div>
+
+        <div className="max-w-2xl mx-auto px-4 py-8">
+          {/* Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">{exercicio.titulo}</h1>
+            <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="w-4 h-4" />
+                {Math.floor(exercicio.tempo_limite / 60)} minutos
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Target className="w-4 h-4" />
+                Símbolo alvo: <span className="text-white text-lg">{targetSymbol}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden mb-8">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-accent" />
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider">Instruções do Teste</h2>
+            </div>
+            <div className="px-6 py-5 max-h-[40vh] overflow-y-auto">
+              <div className="space-y-3">
+                {paragraphs.map((p: string, i: number) => {
+                  const trimmed = p.trim()
+                  if (trimmed === trimmed.toUpperCase() && trimmed.length > 3 && !trimmed.startsWith('•') && !trimmed.startsWith('—')) {
+                    return <p key={i} className="text-accent font-bold text-sm mt-4 first:mt-0">{trimmed}</p>
+                  }
+                  if (trimmed.startsWith('•') || trimmed.startsWith('—') || trimmed.startsWith('-')) {
+                    return <p key={i} className="text-gray-300 text-sm pl-4 leading-relaxed">{trimmed}</p>
+                  }
+                  return <p key={i} className="text-gray-300 text-sm leading-relaxed">{trimmed}</p>
+                })}
+              </div>
+            </div>
+            <div className="px-6 py-3 bg-white/5 flex items-center justify-center">
+              <ChevronDown className="w-4 h-4 text-gray-500 animate-bounce" />
+            </div>
+          </div>
+
+          {/* Start button */}
           <button
             onClick={startExercise}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:bg-accent-dark transition-colors shadow-lg shadow-accent/25"
+            className="w-full inline-flex items-center justify-center gap-3 px-8 py-5 bg-accent text-white font-bold text-lg rounded-2xl hover:bg-accent-dark transition-all shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5"
           >
             <Play className="w-6 h-6" />
-            Começar
+            Iniciar Teste
           </button>
         </div>
       </div>
     )
   }
 
+  const timerWarning = timeLeft < 60
+
   return (
     <div className="min-h-screen bg-primary flex flex-col">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-primary-dark">
-        <div className="flex items-center gap-4">
-          <span className="text-2xl font-mono font-bold text-white">
+      <div className="flex items-center justify-between px-4 py-3 bg-primary-dark border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className={`px-3 py-1.5 rounded-lg font-mono font-bold text-lg ${
+            timerWarning ? 'bg-danger/20 text-danger animate-pulse' : 'bg-white/10 text-white'
+          }`}>
             {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-          </span>
-          <span className="text-sm text-gray-400">{exercicio.titulo}</span>
+          </div>
+          <span className="text-sm text-gray-500 hidden sm:block">{exercicio.titulo}</span>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={togglePause}
-            className="p-2 text-gray-400 hover:text-white transition-colors"
+            className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
           >
             {paused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
           </button>
           <button
             onClick={finishExercise}
-            className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+            className="p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg hover:bg-white/10"
           >
             <X className="w-5 h-5" />
           </button>
@@ -203,13 +267,16 @@ export function Exercicio() {
       {/* Exercise area */}
       <div className="flex-1 flex items-center justify-center p-4 relative">
         {paused && (
-          <div className="absolute inset-0 bg-primary/95 flex items-center justify-center z-10">
+          <div className="absolute inset-0 bg-primary/95 backdrop-blur-sm flex items-center justify-center z-10">
             <div className="text-center">
-              <Pause className="w-12 h-12 text-accent mx-auto mb-4" />
-              <p className="text-xl font-bold text-white mb-4">Pausado</p>
+              <div className="w-20 h-20 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-6">
+                <Pause className="w-10 h-10 text-accent" />
+              </div>
+              <p className="text-2xl font-bold text-white mb-2">Teste Pausado</p>
+              <p className="text-gray-400 mb-8">Acertos: {acertos} · Erros: {erros}</p>
               <button
                 onClick={togglePause}
-                className="px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent-dark transition-colors"
+                className="px-8 py-4 bg-accent text-white font-bold rounded-xl hover:bg-accent-dark transition-colors shadow-lg shadow-accent/25"
               >
                 Continuar
               </button>
@@ -218,7 +285,7 @@ export function Exercicio() {
         )}
 
         <div
-          className="grid gap-1 select-none"
+          className="grid gap-1 sm:gap-1.5 select-none"
           style={{
             gridTemplateColumns: `repeat(${gridConfig.colunas}, minmax(0, 1fr))`,
           }}
@@ -227,12 +294,12 @@ export function Exercicio() {
             <button
               key={i}
               onClick={() => handleCellClick(i)}
-              className={`w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm rounded transition-all ${
+              className={`w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center text-xs sm:text-sm md:text-base rounded-md transition-all ${
                 cell.marked
                   ? cell.isTarget
-                    ? 'bg-success/30 text-success'
-                    : 'bg-danger/30 text-danger'
-                  : 'bg-white/10 text-white hover:bg-white/20'
+                    ? 'bg-success/30 text-success ring-1 ring-success/50'
+                    : 'bg-danger/30 text-danger ring-1 ring-danger/50'
+                  : 'bg-white/10 text-white hover:bg-white/20 hover:scale-110 active:scale-95'
               }`}
               disabled={cell.marked || paused}
             >
@@ -243,14 +310,22 @@ export function Exercicio() {
       </div>
 
       {/* Bottom bar */}
-      <div className="flex items-center justify-center gap-8 px-4 py-3 bg-primary-dark">
+      <div className="flex items-center justify-center gap-8 px-4 py-3 bg-primary-dark border-t border-white/10">
         <div className="text-center">
           <span className="text-2xl font-bold text-success">{acertos}</span>
-          <p className="text-xs text-gray-400">Acertos</p>
+          <p className="text-xs text-gray-500">Acertos</p>
         </div>
+        <div className="w-px h-8 bg-white/10" />
         <div className="text-center">
           <span className="text-2xl font-bold text-danger">{erros}</span>
-          <p className="text-xs text-gray-400">Erros</p>
+          <p className="text-xs text-gray-500">Erros</p>
+        </div>
+        <div className="w-px h-8 bg-white/10" />
+        <div className="text-center">
+          <span className="text-2xl font-bold text-gray-300">
+            {Math.round((acertos / Math.max(acertos + erros, 1)) * 100)}%
+          </span>
+          <p className="text-xs text-gray-500">Precisão</p>
         </div>
       </div>
     </div>
