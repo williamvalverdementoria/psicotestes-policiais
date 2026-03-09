@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Pause, Play, X, Clock, Target, AlertTriangle, ChevronDown } from 'lucide-react'
+import { Pause, Play, X, Clock, Target, AlertTriangle, ChevronDown, Lightbulb, BookOpen, ThumbsUp, ThumbsDown, Check, ArrowRight, FileText } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
+import { getCoachingScript } from '@/lib/coaching-scripts'
 import { QuizExercicio } from '@/components/QuizExercicio'
 import type { Exercicio as ExercicioType } from '@/types/database'
 
@@ -25,6 +26,7 @@ export function Exercicio() {
   const [erros, setErros] = useState(0)
   const [grid, setGrid] = useState<GridCell[]>([])
   const [gridConfig, setGridConfig] = useState({ linhas: 10, colunas: 15 })
+  const [preTestStep, setPreTestStep] = useState<'tutorial' | 'instructions'>('tutorial')
   const startTimeRef = useRef<number>(0)
   const timerRef = useRef<ReturnType<typeof setInterval>>(undefined)
 
@@ -159,19 +161,140 @@ export function Exercicio() {
   if (!started) {
     const instrucoes = exercicio.instrucoes || ''
     const paragraphs = instrucoes.split('\n').filter((p: string) => p.trim())
-    const config = exercicio.config_json as Record<string, unknown>
-    const targetSymbol = (config?.simbolo_alvo as string) || (config?.alvo as string) || '◆'
+    const configData = exercicio.config_json as Record<string, unknown>
+    const targetSymbol = (configData?.simbolo_alvo as string) || (configData?.alvo as string) || '◆'
+    const coaching = getCoachingScript(exercicio.titulo, configData)
 
+    const StepIndicator = () => (
+      <div className="flex items-center justify-center gap-2 mb-8">
+        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+          preTestStep === 'tutorial' ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-white/5 text-gray-500 border border-white/10'
+        }`}>
+          <Lightbulb className="w-3.5 h-3.5" />
+          Script
+        </div>
+        <div className="w-6 h-px bg-white/20" />
+        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+          preTestStep === 'instructions' ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-white/5 text-gray-500 border border-white/10'
+        }`}>
+          <BookOpen className="w-3.5 h-3.5" />
+          Instruções
+        </div>
+      </div>
+    )
+
+    // ─── TUTORIAL / COACHING STEP ───
+    if (preTestStep === 'tutorial') {
+      return (
+        <div className="min-h-screen bg-primary">
+          <div className="bg-primary-dark border-b border-white/10">
+            <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+              <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border text-blue-400 bg-blue-500/20 border-blue-500/30">
+                <Target className="w-3.5 h-3.5" />
+                Atenção
+              </span>
+            </div>
+          </div>
+
+          <div className="max-w-2xl mx-auto px-4 py-8">
+            <StepIndicator />
+
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 rounded-2xl bg-accent/20 flex items-center justify-center mx-auto mb-4">
+                <Lightbulb className="w-8 h-8 text-accent" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">{coaching.titulo}</h1>
+              <p className="text-gray-400 text-sm leading-relaxed max-w-lg mx-auto">{coaching.descricao}</p>
+            </div>
+
+            <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-1">
+              {/* Como Funciona */}
+              <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+                <div className="px-5 py-3 border-b border-white/10 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-accent" />
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">Como Funciona</h3>
+                </div>
+                <div className="px-5 py-4 space-y-2">
+                  {coaching.comoFunciona.map((item, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-accent/20 text-accent text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                      <p className="text-gray-300 text-sm leading-relaxed">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dicas Estratégicas */}
+              <div className="bg-amber-500/5 border border-amber-500/15 rounded-2xl overflow-hidden">
+                <div className="px-5 py-3 border-b border-amber-500/15 flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-amber-400" />
+                  <h3 className="text-sm font-bold text-amber-300 uppercase tracking-wider">Dicas Estratégicas</h3>
+                </div>
+                <div className="px-5 py-4 space-y-2">
+                  {coaching.dicasEstrategicas.map((item, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <span className="text-amber-400 mt-1">•</span>
+                      <p className="text-gray-300 text-sm leading-relaxed">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* O Que Marcar */}
+              <div className="bg-success/5 border border-success/15 rounded-2xl overflow-hidden">
+                <div className="px-5 py-3 border-b border-success/15 flex items-center gap-2">
+                  <ThumbsUp className="w-4 h-4 text-success" />
+                  <h3 className="text-sm font-bold text-success uppercase tracking-wider">O Que Marcar</h3>
+                </div>
+                <div className="px-5 py-4 space-y-2">
+                  {coaching.oQueMarcar.map((item, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
+                      <p className="text-gray-300 text-sm leading-relaxed">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* O Que NÃO Marcar */}
+              <div className="bg-danger/5 border border-danger/15 rounded-2xl overflow-hidden">
+                <div className="px-5 py-3 border-b border-danger/15 flex items-center gap-2">
+                  <ThumbsDown className="w-4 h-4 text-danger" />
+                  <h3 className="text-sm font-bold text-danger uppercase tracking-wider">O Que NÃO Marcar</h3>
+                </div>
+                <div className="px-5 py-4 space-y-2">
+                  {coaching.oQueNaoMarcar.map((item, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <X className="w-4 h-4 text-danger flex-shrink-0 mt-0.5" />
+                      <p className="text-gray-300 text-sm leading-relaxed">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setPreTestStep('instructions')}
+              className="w-full mt-6 inline-flex items-center justify-center gap-3 px-8 py-5 bg-accent text-white font-bold text-lg rounded-2xl hover:bg-accent-dark transition-all shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5"
+            >
+              Entendi, ver Instruções
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    // ─── INSTRUCTIONS STEP ───
     return (
       <div className="min-h-screen bg-primary">
-        {/* Header */}
         <div className="bg-primary-dark border-b border-white/10">
           <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
+            <button onClick={() => setPreTestStep('tutorial')} className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors">
+              <ArrowRight className="w-5 h-5 rotate-180" />
             </button>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border text-blue-400 bg-blue-500/20 border-blue-500/30">
               <Target className="w-3.5 h-3.5" />
@@ -181,7 +304,8 @@ export function Exercicio() {
         </div>
 
         <div className="max-w-2xl mx-auto px-4 py-8">
-          {/* Title */}
+          <StepIndicator />
+
           <div className="text-center mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">{exercicio.titulo}</h1>
             <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
@@ -196,7 +320,6 @@ export function Exercicio() {
             </div>
           </div>
 
-          {/* Instructions */}
           <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden mb-8">
             <div className="px-6 py-4 border-b border-white/10 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-accent" />
@@ -221,7 +344,6 @@ export function Exercicio() {
             </div>
           </div>
 
-          {/* Start button */}
           <button
             onClick={startExercise}
             className="w-full inline-flex items-center justify-center gap-3 px-8 py-5 bg-accent text-white font-bold text-lg rounded-2xl hover:bg-accent-dark transition-all shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5"
