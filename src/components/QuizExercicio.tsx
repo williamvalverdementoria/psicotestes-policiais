@@ -13,6 +13,7 @@ interface Questao {
   opcoes: string[]
   resposta_correta: number
   explicacao: string | null
+  imagem_url: string | null
 }
 
 interface Props {
@@ -542,6 +543,16 @@ export function QuizExercicio({ exercicio }: Props) {
             <p className="text-base sm:text-lg text-white/90 font-medium leading-relaxed">
               {questao.enunciado}
             </p>
+            {questao.imagem_url && (
+              <div className="mt-4 flex justify-center">
+                <img
+                  src={questao.imagem_url}
+                  alt={`Imagem da questão ${questao.numero}`}
+                  className="max-w-full max-h-[300px] rounded-xl border border-white/10 bg-white/5 object-contain"
+                  loading="lazy"
+                />
+              </div>
+            )}
           </div>
 
           {/* Options - Likert style */}

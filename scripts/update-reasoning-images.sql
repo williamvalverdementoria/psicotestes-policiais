@@ -1,0 +1,13 @@
+UPDATE questoes SET imagem_url = '/images/raven/raven-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000001';
+UPDATE questoes SET imagem_url = '/images/mig/mig-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000002';
+UPDATE questoes SET imagem_url = '/images/wmt2/wmt2-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000003';
+UPDATE questoes SET imagem_url = '/images/tignv/tignv-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000004';
+UPDATE questoes SET imagem_url = '/images/beta3/beta3-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000005';
+UPDATE questoes SET imagem_url = '/images/g36/g36-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000006';
+UPDATE questoes SET imagem_url = '/images/r1/r1-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000009';
+UPDATE questoes SET imagem_url = '/images/relogios/relogios-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000007';
+UPDATE questoes SET imagem_url = '/images/dominos/dominos-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000008';
+UPDATE questoes SET imagem_url = '/images/d70/d70-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000018';
+UPDATE questoes SET imagem_url = '/images/bpr5ra/bpr5ra-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000010';
+UPDATE questoes SET imagem_url = '/images/bpr5re/bpr5re-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000011';
+UPDATE questoes SET imagem_url = '/images/cubos/cubos-' || LPAD(numero::text, 2, '0') || '.svg' WHERE exercicio_id = 'a1000001-0000-0000-0000-000000000017';
