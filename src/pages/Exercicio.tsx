@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Pause, Play, X, Clock, Target, AlertTriangle, ChevronDown, Lightbulb, BookOpen, ThumbsUp, ThumbsDown, Check, ArrowRight, FileText } from 'lucide-react'
+import { Pause, Play, X, Clock, Target, ChevronDown, Lightbulb, BookOpen, Shield, Check, CheckCircle2, XCircle, ArrowRight, FileText, Zap, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { getCoachingScript } from '@/lib/coaching-scripts'
@@ -11,6 +11,55 @@ interface GridCell {
   symbol: string
   isTarget: boolean
   marked: boolean
+}
+
+function GridCoachingSection({ section }: { section: {
+  id: string
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  items: string[]
+  accent: string
+  bg: string
+  itemIcon: React.ComponentType<{ className?: string }> | null
+  numbered: boolean
+} }) {
+  const [expanded, setExpanded] = useState(section.id === 'como-funciona')
+  const Icon = section.icon
+  const ItemIcon = section.itemIcon
+
+  return (
+    <div className={`coaching-section border rounded-xl transition-all duration-300 cursor-pointer ${section.bg}`}>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full px-4 py-3 flex items-center justify-between gap-3 text-left"
+      >
+        <div className="flex items-center gap-2.5">
+          <Icon className={`w-4 h-4 ${section.accent} flex-shrink-0`} />
+          <span className="text-[13px] font-semibold text-white">{section.title}</span>
+          <span className="text-[11px] text-gray-500 font-medium">{section.items.length}</span>
+        </div>
+        <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`} />
+      </button>
+      <div className={`coaching-section-content ${expanded ? 'expanded' : ''}`}>
+        <div>
+          <div className="px-4 pb-3 space-y-1.5">
+            {section.items.map((item, i) => (
+              <div key={i} className="flex items-start gap-2.5 animate-slide-in-right" style={{ animationDelay: `${i * 50}ms` }}>
+                {section.numbered ? (
+                  <span className={`w-5 h-5 rounded-md bg-white/5 ${section.accent} text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5`}>{i + 1}</span>
+                ) : ItemIcon ? (
+                  <ItemIcon className={`w-3.5 h-3.5 ${section.accent} flex-shrink-0 mt-1`} />
+                ) : (
+                  <span className={`w-1 h-1 rounded-full mt-2 flex-shrink-0 ${section.accent.replace('text-', 'bg-')}`} />
+                )}
+                <p className="text-gray-400 text-[13px] leading-relaxed">{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export function Exercicio() {
@@ -165,20 +214,27 @@ export function Exercicio() {
     const targetSymbol = (configData?.simbolo_alvo as string) || (configData?.alvo as string) || '◆'
     const coaching = getCoachingScript(exercicio.titulo, configData)
 
+    const coachingSections = [
+      { id: 'como-funciona', icon: BookOpen, title: 'Como Funciona', items: coaching.comoFunciona, accent: 'text-blue-400', bg: 'bg-blue-500/5 border-blue-500/10 hover:border-blue-500/20', itemIcon: null as null, numbered: true },
+      { id: 'dicas', icon: Zap, title: 'Estratégia', items: coaching.dicasEstrategicas, accent: 'text-amber-400', bg: 'bg-amber-500/5 border-amber-500/10 hover:border-amber-500/20', itemIcon: null as null, numbered: false },
+      { id: 'marcar', icon: CheckCircle2, title: 'O Que Marcar', items: coaching.oQueMarcar, accent: 'text-emerald-400', bg: 'bg-emerald-500/5 border-emerald-500/10 hover:border-emerald-500/20', itemIcon: Check, numbered: false },
+      { id: 'nao-marcar', icon: XCircle, title: 'O Que Evitar', items: coaching.oQueNaoMarcar, accent: 'text-red-400', bg: 'bg-red-500/5 border-red-500/10 hover:border-red-500/20', itemIcon: X, numbered: false },
+    ]
+
     const StepIndicator = () => (
-      <div className="flex items-center justify-center gap-2 mb-8">
-        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-          preTestStep === 'tutorial' ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-white/5 text-gray-500 border border-white/10'
-        }`}>
-          <Lightbulb className="w-3.5 h-3.5" />
-          Script
+      <div className="flex items-center justify-center gap-3 mb-10 animate-fade-in">
+        <div className="flex items-center gap-2">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+            preTestStep === 'tutorial' ? 'bg-accent text-white shadow-lg shadow-accent/30' : 'bg-accent/10 text-accent'
+          }`}>1</div>
+          <span className={`text-xs font-medium transition-colors hidden sm:block ${preTestStep === 'tutorial' ? 'text-white' : 'text-gray-500'}`}>Script</span>
         </div>
-        <div className="w-6 h-px bg-white/20" />
-        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-          preTestStep === 'instructions' ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-white/5 text-gray-500 border border-white/10'
-        }`}>
-          <BookOpen className="w-3.5 h-3.5" />
-          Instruções
+        <div className={`w-10 h-[2px] rounded-full transition-colors duration-500 ${preTestStep === 'instructions' ? 'bg-accent' : 'bg-white/10'}`} />
+        <div className="flex items-center gap-2">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+            preTestStep === 'instructions' ? 'bg-accent text-white shadow-lg shadow-accent/30' : 'bg-white/5 text-gray-500'
+          }`}>2</div>
+          <span className={`text-xs font-medium transition-colors hidden sm:block ${preTestStep === 'instructions' ? 'text-white' : 'text-gray-500'}`}>Instruções</span>
         </div>
       </div>
     )
@@ -186,102 +242,43 @@ export function Exercicio() {
     // ─── TUTORIAL / COACHING STEP ───
     if (preTestStep === 'tutorial') {
       return (
-        <div className="min-h-screen bg-primary">
-          <div className="bg-primary-dark border-b border-white/10">
-            <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-              <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors">
+        <div className="min-h-screen bg-gradient-to-b from-primary-dark via-primary to-primary">
+          <div className="border-b border-white/5">
+            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+              <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-gray-500 hover:text-white transition-colors rounded-lg hover:bg-white/5">
                 <X className="w-5 h-5" />
               </button>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border text-blue-400 bg-blue-500/20 border-blue-500/30">
-                <Target className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border text-cyan-300 bg-cyan-500/10 border-cyan-500/20">
+                <Target className="w-3 h-3" />
                 Atenção
               </span>
             </div>
           </div>
 
-          <div className="max-w-2xl mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
             <StepIndicator />
 
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-accent/20 flex items-center justify-center mx-auto mb-4">
-                <Lightbulb className="w-8 h-8 text-accent" />
+            <div className="text-center mb-8 animate-fade-in-up">
+              <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4 animate-pulse-glow">
+                <Shield className="w-7 h-7 text-accent" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">{coaching.titulo}</h1>
-              <p className="text-gray-400 text-sm leading-relaxed max-w-lg mx-auto">{coaching.descricao}</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">{coaching.titulo}</h1>
+              <p className="text-gray-400 text-sm leading-relaxed max-w-md mx-auto">{coaching.descricao}</p>
             </div>
 
-            <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-1">
-              {/* Como Funciona */}
-              <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-                <div className="px-5 py-3 border-b border-white/10 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-accent" />
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">Como Funciona</h3>
-                </div>
-                <div className="px-5 py-4 space-y-2">
-                  {coaching.comoFunciona.map((item, i) => (
-                    <div key={i} className="flex items-start gap-2.5">
-                      <span className="w-5 h-5 rounded-full bg-accent/20 text-accent text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-                      <p className="text-gray-300 text-sm leading-relaxed">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Dicas Estratégicas */}
-              <div className="bg-amber-500/5 border border-amber-500/15 rounded-2xl overflow-hidden">
-                <div className="px-5 py-3 border-b border-amber-500/15 flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4 text-amber-400" />
-                  <h3 className="text-sm font-bold text-amber-300 uppercase tracking-wider">Dicas Estratégicas</h3>
-                </div>
-                <div className="px-5 py-4 space-y-2">
-                  {coaching.dicasEstrategicas.map((item, i) => (
-                    <div key={i} className="flex items-start gap-2.5">
-                      <span className="text-amber-400 mt-1">•</span>
-                      <p className="text-gray-300 text-sm leading-relaxed">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* O Que Marcar */}
-              <div className="bg-success/5 border border-success/15 rounded-2xl overflow-hidden">
-                <div className="px-5 py-3 border-b border-success/15 flex items-center gap-2">
-                  <ThumbsUp className="w-4 h-4 text-success" />
-                  <h3 className="text-sm font-bold text-success uppercase tracking-wider">O Que Marcar</h3>
-                </div>
-                <div className="px-5 py-4 space-y-2">
-                  {coaching.oQueMarcar.map((item, i) => (
-                    <div key={i} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
-                      <p className="text-gray-300 text-sm leading-relaxed">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* O Que NÃO Marcar */}
-              <div className="bg-danger/5 border border-danger/15 rounded-2xl overflow-hidden">
-                <div className="px-5 py-3 border-b border-danger/15 flex items-center gap-2">
-                  <ThumbsDown className="w-4 h-4 text-danger" />
-                  <h3 className="text-sm font-bold text-danger uppercase tracking-wider">O Que NÃO Marcar</h3>
-                </div>
-                <div className="px-5 py-4 space-y-2">
-                  {coaching.oQueNaoMarcar.map((item, i) => (
-                    <div key={i} className="flex items-start gap-2.5">
-                      <X className="w-4 h-4 text-danger flex-shrink-0 mt-0.5" />
-                      <p className="text-gray-300 text-sm leading-relaxed">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="space-y-2 max-h-[55vh] overflow-y-auto pr-1 stagger-children">
+              {coachingSections.map((section) => (
+                <GridCoachingSection key={section.id} section={section} />
+              ))}
             </div>
 
             <button
               onClick={() => setPreTestStep('instructions')}
-              className="w-full mt-6 inline-flex items-center justify-center gap-3 px-8 py-5 bg-accent text-white font-bold text-lg rounded-2xl hover:bg-accent-dark transition-all shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5"
+              className="w-full mt-6 group inline-flex items-center justify-center gap-3 px-8 py-4 bg-accent text-white font-semibold rounded-xl hover:bg-accent-dark transition-all duration-200 shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/25 animate-fade-in-up"
+              style={{ animationDelay: '500ms' }}
             >
-              Entendi, ver Instruções
-              <ArrowRight className="w-5 h-5" />
+              Continuar para Instruções
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
@@ -290,65 +287,64 @@ export function Exercicio() {
 
     // ─── INSTRUCTIONS STEP ───
     return (
-      <div className="min-h-screen bg-primary">
-        <div className="bg-primary-dark border-b border-white/10">
-          <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-            <button onClick={() => setPreTestStep('tutorial')} className="p-2 -ml-2 text-gray-400 hover:text-white transition-colors">
-              <ArrowRight className="w-5 h-5 rotate-180" />
+      <div className="min-h-screen bg-gradient-to-b from-primary-dark via-primary to-primary">
+        <div className="border-b border-white/5">
+          <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+            <button onClick={() => setPreTestStep('tutorial')} className="p-2 -ml-2 text-gray-500 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+              <ChevronRight className="w-5 h-5 rotate-180" />
             </button>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border text-blue-400 bg-blue-500/20 border-blue-500/30">
-              <Target className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border text-cyan-300 bg-cyan-500/10 border-cyan-500/20">
+              <Target className="w-3 h-3" />
               Atenção
             </span>
           </div>
         </div>
 
-        <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto px-4 py-6 sm:py-8 step-transition-enter">
           <StepIndicator />
 
-          <div className="text-center mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">{exercicio.titulo}</h1>
-            <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
+          <div className="text-center mb-8 animate-fade-in-up">
+            <h1 className="text-xl sm:text-2xl font-bold text-white mb-3 tracking-tight">{exercicio.titulo}</h1>
+            <div className="flex items-center justify-center gap-5 text-sm text-gray-400">
               <span className="inline-flex items-center gap-1.5">
-                <Clock className="w-4 h-4" />
-                {Math.floor(exercicio.tempo_limite / 60)} minutos
+                <Clock className="w-4 h-4 text-gray-500" />
+                {Math.floor(exercicio.tempo_limite / 60)} min
               </span>
+              <span className="w-1 h-1 rounded-full bg-white/20" />
               <span className="inline-flex items-center gap-1.5">
-                <Target className="w-4 h-4" />
-                Símbolo alvo: <span className="text-white text-lg">{targetSymbol}</span>
+                <Target className="w-4 h-4 text-gray-500" />
+                Alvo: <span className="text-white text-base">{targetSymbol}</span>
               </span>
             </div>
           </div>
 
-          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden mb-8">
-            <div className="px-6 py-4 border-b border-white/10 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-accent" />
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">Instruções do Teste</h2>
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden mb-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+            <div className="px-5 py-3.5 border-b border-white/[0.06] flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-accent" />
+              <h2 className="text-sm font-semibold text-white">Instruções do Teste</h2>
             </div>
-            <div className="px-6 py-5 max-h-[40vh] overflow-y-auto">
-              <div className="space-y-3">
+            <div className="px-5 py-4 max-h-[40vh] overflow-y-auto">
+              <div className="space-y-2.5">
                 {paragraphs.map((p: string, i: number) => {
                   const trimmed = p.trim()
                   if (trimmed === trimmed.toUpperCase() && trimmed.length > 3 && !trimmed.startsWith('•') && !trimmed.startsWith('—')) {
-                    return <p key={i} className="text-accent font-bold text-sm mt-4 first:mt-0">{trimmed}</p>
+                    return <p key={i} className="text-accent font-semibold text-sm mt-5 first:mt-0 tracking-wide">{trimmed}</p>
                   }
                   if (trimmed.startsWith('•') || trimmed.startsWith('—') || trimmed.startsWith('-')) {
-                    return <p key={i} className="text-gray-300 text-sm pl-4 leading-relaxed">{trimmed}</p>
+                    return <p key={i} className="text-gray-400 text-sm pl-4 leading-relaxed">{trimmed}</p>
                   }
-                  return <p key={i} className="text-gray-300 text-sm leading-relaxed">{trimmed}</p>
+                  return <p key={i} className="text-gray-400 text-sm leading-relaxed">{trimmed}</p>
                 })}
               </div>
-            </div>
-            <div className="px-6 py-3 bg-white/5 flex items-center justify-center">
-              <ChevronDown className="w-4 h-4 text-gray-500 animate-bounce" />
             </div>
           </div>
 
           <button
             onClick={startExercise}
-            className="w-full inline-flex items-center justify-center gap-3 px-8 py-5 bg-accent text-white font-bold text-lg rounded-2xl hover:bg-accent-dark transition-all shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5"
+            className="w-full group inline-flex items-center justify-center gap-3 px-8 py-4 bg-accent text-white font-semibold rounded-xl hover:bg-accent-dark transition-all duration-200 shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/25 animate-fade-in-up"
+            style={{ animationDelay: '200ms' }}
           >
-            <Play className="w-6 h-6" />
+            <Play className="w-5 h-5" />
             Iniciar Teste
           </button>
         </div>
@@ -359,29 +355,29 @@ export function Exercicio() {
   const timerWarning = timeLeft < 60
 
   return (
-    <div className="min-h-screen bg-primary flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary flex flex-col">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-primary-dark border-b border-white/10">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5">
         <div className="flex items-center gap-3">
-          <div className={`px-3 py-1.5 rounded-lg font-mono font-bold text-lg ${
-            timerWarning ? 'bg-danger/20 text-danger animate-pulse' : 'bg-white/10 text-white'
+          <div className={`px-3 py-1.5 rounded-lg font-mono font-semibold text-base tabular-nums ${
+            timerWarning ? 'bg-red-500/10 text-red-400 animate-pulse' : 'bg-white/5 text-white/80'
           }`}>
             {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
           </div>
-          <span className="text-sm text-gray-500 hidden sm:block">{exercicio.titulo}</span>
+          <span className="text-xs text-gray-500 hidden sm:block font-medium">{exercicio.titulo}</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={togglePause}
-            className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+            className="p-2 text-gray-500 hover:text-white transition-colors rounded-lg hover:bg-white/5"
           >
-            {paused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+            {paused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
           </button>
           <button
             onClick={finishExercise}
-            className="p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg hover:bg-white/10"
+            className="p-2 text-gray-500 hover:text-red-400 transition-colors rounded-lg hover:bg-white/5"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -416,12 +412,12 @@ export function Exercicio() {
             <button
               key={i}
               onClick={() => handleCellClick(i)}
-              className={`w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center text-xs sm:text-sm md:text-base rounded-md transition-all ${
+              className={`w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center text-xs sm:text-sm md:text-base rounded-lg transition-all duration-150 ${
                 cell.marked
                   ? cell.isTarget
-                    ? 'bg-success/30 text-success ring-1 ring-success/50'
-                    : 'bg-danger/30 text-danger ring-1 ring-danger/50'
-                  : 'bg-white/10 text-white hover:bg-white/20 hover:scale-110 active:scale-95'
+                    ? 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30'
+                    : 'bg-red-500/20 text-red-400 ring-1 ring-red-500/30'
+                  : 'bg-white/[0.04] text-white/70 hover:bg-white/10 hover:scale-105 active:scale-95 border border-white/[0.04]'
               }`}
               disabled={cell.marked || paused}
             >
@@ -432,22 +428,22 @@ export function Exercicio() {
       </div>
 
       {/* Bottom bar */}
-      <div className="flex items-center justify-center gap-8 px-4 py-3 bg-primary-dark border-t border-white/10">
+      <div className="flex items-center justify-center gap-6 px-4 py-2.5 border-t border-white/5">
         <div className="text-center">
-          <span className="text-2xl font-bold text-success">{acertos}</span>
-          <p className="text-xs text-gray-500">Acertos</p>
+          <span className="text-lg font-semibold text-emerald-400 tabular-nums">{acertos}</span>
+          <p className="text-[10px] text-gray-600 font-medium">Acertos</p>
         </div>
-        <div className="w-px h-8 bg-white/10" />
+        <div className="w-px h-6 bg-white/5" />
         <div className="text-center">
-          <span className="text-2xl font-bold text-danger">{erros}</span>
-          <p className="text-xs text-gray-500">Erros</p>
+          <span className="text-lg font-semibold text-red-400 tabular-nums">{erros}</span>
+          <p className="text-[10px] text-gray-600 font-medium">Erros</p>
         </div>
-        <div className="w-px h-8 bg-white/10" />
+        <div className="w-px h-6 bg-white/5" />
         <div className="text-center">
-          <span className="text-2xl font-bold text-gray-300">
+          <span className="text-lg font-semibold text-white/70 tabular-nums">
             {Math.round((acertos / Math.max(acertos + erros, 1)) * 100)}%
           </span>
-          <p className="text-xs text-gray-500">Precisão</p>
+          <p className="text-[10px] text-gray-600 font-medium">Precisão</p>
         </div>
       </div>
     </div>
