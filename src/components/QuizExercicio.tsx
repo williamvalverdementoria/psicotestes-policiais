@@ -37,13 +37,13 @@ export function QuizExercicio({ exercicio }: Props) {
 
   useEffect(() => {
     supabase
-      .from('questoes')
+      .from('questoes' as any)
       .select('*')
       .eq('exercicio_id', exercicio.id)
       .order('numero')
-      .then(({ data }) => {
+      .then(({ data }: { data: any[] | null }) => {
         if (data) {
-          setQuestoes(data.map(q => ({
+          setQuestoes(data.map((q: any) => ({
             ...q,
             opcoes: typeof q.opcoes === 'string' ? JSON.parse(q.opcoes) : q.opcoes,
           })))
