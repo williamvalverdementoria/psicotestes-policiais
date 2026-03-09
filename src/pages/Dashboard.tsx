@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Play, Flame, TrendingUp } from 'lucide-react'
+import { Play, Flame } from 'lucide-react'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
@@ -75,7 +75,7 @@ export function Dashboard() {
         for (const s of sessoes) {
           const cId = exercicioToConstructo.get(s.exercicio_id)
           if (cId && !latestScores.has(cId)) {
-            latestScores.set(cId, s.score)
+            latestScores.set(cId, s.score ?? 0)
           }
         }
 
@@ -88,7 +88,7 @@ export function Dashboard() {
       }
 
       // Calculate streak
-      const dates = [...new Set(sessoes.map(s => s.started_at.split('T')[0]))].sort().reverse()
+      const dates = [...new Set(sessoes.map(s => (s.started_at ?? '').split('T')[0]))].sort().reverse()
       let streakCount = 0
       const today = new Date().toISOString().split('T')[0]
       for (let i = 0; i < dates.length; i++) {
@@ -175,7 +175,7 @@ export function Dashboard() {
           <div className="mb-4">
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="text-gray-500">Progresso geral</span>
-              <span className="font-bold text-primary">{plano ? Math.round(plano.progresso) : 0}%</span>
+              <span className="font-bold text-primary">{plano ? Math.round(plano.progresso ?? 0) : 0}%</span>
             </div>
             <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
               <div

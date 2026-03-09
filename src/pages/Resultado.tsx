@@ -67,12 +67,12 @@ export function Resultado() {
         if (sessions && sessions.length > 0) {
           setHistory(sessions.map((s, i) => ({
             name: `S${i + 1}`,
-            score: s.score,
+            score: s.score ?? 0,
           })))
 
           // Previous score
-          const prev = sessions.find(s => s.started_at < sessaoData.started_at)
-          if (prev) setPreviousScore(prev.score)
+          const prev = sessions.find(s => (s.started_at ?? '') < (sessaoData.started_at ?? ''))
+          if (prev) setPreviousScore(prev.score ?? 0)
         }
       }
     }
@@ -86,12 +86,15 @@ export function Resultado() {
     )
   }
 
-  const scoreColor = sessao.score >= 70 ? 'text-success' : sessao.score >= 40 ? 'text-warning' : 'text-danger'
-  const diff = previousScore !== null ? sessao.score - previousScore : null
+  const score = sessao.score ?? 0
+  const scoreColor = score >= 70 ? 'text-success' : score >= 40 ? 'text-warning' : 'text-danger'
+  const diff = previousScore !== null ? score - previousScore : null
   const tempoMinutos = sessao.tempo_gasto ? Math.floor(sessao.tempo_gasto / 60000) : 0
   const tempoSegundos = sessao.tempo_gasto ? Math.floor((sessao.tempo_gasto % 60000) / 1000) : 0
-  const total = sessao.acertos + sessao.erros
-  const precisao = total > 0 ? Math.round((sessao.acertos / total) * 100) : 0
+  const acertos = sessao.acertos ?? 0
+  const errosVal = sessao.erros ?? 0
+  const total = acertos + errosVal
+  const precisao = total > 0 ? Math.round((acertos / total) * 100) : 0
 
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center px-4 py-12">
@@ -103,7 +106,7 @@ export function Resultado() {
 
         {/* Score */}
         <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center mb-6">
-          <div className={`text-6xl font-extrabold ${scoreColor} mb-2`}>{sessao.score}</div>
+          <div className={`text-6xl font-extrabold ${scoreColor} mb-2`}>{score}</div>
           <p className="text-gray-400 text-sm mb-4">de 100 pontos</p>
 
           {diff !== null && (
@@ -129,7 +132,7 @@ export function Resultado() {
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
             <Target className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-            <p className="text-lg font-bold text-success">{sessao.acertos}</p>
+            <p className="text-lg font-bold text-success">{acertos}</p>
             <p className="text-xs text-gray-400">Acertos</p>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">

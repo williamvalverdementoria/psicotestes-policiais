@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Flame, TrendingUp, Clock, Target } from 'lucide-react'
+import { Flame, TrendingUp, Clock } from 'lucide-react'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
@@ -42,7 +42,7 @@ export function Progresso() {
     setTotalTime(sessoes.reduce((acc, s) => acc + (s.tempo_gasto || 0), 0))
 
     // Streak
-    const dates = [...new Set(sessoes.map(s => s.started_at.split('T')[0]))].sort().reverse()
+    const dates = [...new Set(sessoes.map(s => (s.started_at ?? '').split('T')[0]))].sort().reverse()
     let streakCount = 0
     for (let i = 0; i < dates.length; i++) {
       const expected = new Date(Date.now() - i * 86400000).toISOString().split('T')[0]
@@ -63,8 +63,6 @@ export function Progresso() {
     if (!exercicios || !constructos) { setLoading(false); return }
 
     const exToCtMap = new Map(exercicios.map(e => [e.id, e.constructo_id]))
-    const ctMap = new Map(constructos.map(c => [c.id, c]))
-
     // Group sessions by constructo
     const grouped = new Map<string, typeof sessoes>()
     for (const s of sessoes) {
@@ -78,8 +76,8 @@ export function Progresso() {
       const sessions = grouped.get(ct.id) || []
       return {
         nome: ct.nome,
-        latestScore: sessions.length > 0 ? sessions[sessions.length - 1].score : 0,
-        sessions: sessions.map((s, i) => ({ name: `S${i + 1}`, score: s.score })),
+        latestScore: sessions.length > 0 ? (sessions[sessions.length - 1].score ?? 0) : 0,
+        sessions: sessions.map((s, i) => ({ name: `S${i + 1}`, score: s.score ?? 0 })),
         totalSessions: sessions.length,
         avgTime: sessions.length > 0
           ? sessions.reduce((a, s) => a + (s.tempo_gasto || 0), 0) / sessions.length

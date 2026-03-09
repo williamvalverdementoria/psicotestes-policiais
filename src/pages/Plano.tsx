@@ -75,7 +75,7 @@ export function Plano() {
 
     if (exercicios && constructos) {
       const ctMap = new Map(constructos.map(c => [c.id, c]))
-      const completedMap = new Map(sessoes?.map(s => [s.exercicio_id, s.score]) || [])
+      const completedMap = new Map(sessoes?.map(s => [s.exercicio_id, s.score ?? 0]) || [])
 
       const items: WeekItem[] = exercicios.map(ex => ({
         exercicio: ex,
@@ -121,7 +121,7 @@ export function Plano() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-primary">Seu Plano: {concursoSigla} 2026</h1>
-        <p className="text-gray-500 text-sm mt-1">Progresso: {Math.round(plano.progresso)}%</p>
+        <p className="text-gray-500 text-sm mt-1">Progresso: {Math.round(plano.progresso ?? 0)}%</p>
       </div>
 
       <div className="space-y-6">

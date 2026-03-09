@@ -25,7 +25,7 @@ export function Exercicio() {
   const [grid, setGrid] = useState<GridCell[]>([])
   const [gridConfig, setGridConfig] = useState({ linhas: 10, colunas: 15 })
   const startTimeRef = useRef<number>(0)
-  const timerRef = useRef<ReturnType<typeof setInterval>>()
+  const timerRef = useRef<ReturnType<typeof setInterval>>(undefined)
 
   useEffect(() => {
     if (!id) return

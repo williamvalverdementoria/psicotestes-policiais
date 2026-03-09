@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { User, Mail, Phone, LogOut, Check, Crown } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
