@@ -1,0 +1,93 @@
+{
+  "name": "Psicotestes — Engajamento Diário",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "name": "Cron 8h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/profiles?select=id,nome,email,plano&ultima_sessao=lt.{{ new Date(Date.now() - 48*60*60*1000).toISOString() }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "name": "Buscar Inativos 48h",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [500, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Supabase API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "Loop Usuários",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: 'Psicotestes Policiais <noreply@psicotestespoliciais.com.br>', to: $json.email, subject: '💪 Seu treino de hoje está esperando!', html: '<div style=\"font-family: sans-serif; max-width: 600px; margin: 0 auto;\"><h1 style=\"color: #1a2332;\">Olá, ' + $json.nome + '!</h1><p style=\"color: #666; font-size: 16px;\">Notamos que você não treinou nos últimos 2 dias. A consistência é o segredo para ir bem no psicotécnico!</p><p style=\"color: #666; font-size: 16px;\">Seu plano de treino tem exercícios novos esperando por você.</p><a href=\"{{URL_DO_APP}}/dashboard\" style=\"display: inline-block; padding: 12px 24px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 16px;\">Treinar Agora →</a><p style=\"color: #999; font-size: 12px; margin-top: 32px;\">Psicotestes Policiais — Criado por psicólogo especialista</p></div>' }) }}",
+        "options": {}
+      },
+      "name": "Email Reengajamento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1000, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Resend API Key"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron 8h": {
+      "main": [
+        [{ "node": "Buscar Inativos 48h", "type": "main", "index": 0 }]
+      ]
+    },
+    "Buscar Inativos 48h": {
+      "main": [
+        [{ "node": "Loop Usuários", "type": "main", "index": 0 }]
+      ]
+    },
+    "Loop Usuários": {
+      "main": [
+        [{ "node": "Email Reengajamento", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "name": "Psicotestes — Relatório Semanal Admin",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtDay": 1,
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "name": "Toda Segunda 9h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/rpc/admin_weekly_stats",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {}
+      },
+      "name": "Buscar Métricas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [500, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Supabase API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: 'Psicotestes Policiais <admin@psicotestespoliciais.com.br>', to: 'william@psicotestespoliciais.com.br', subject: '📊 Relatório Semanal — Psicotestes Policiais', html: '<div style=\"font-family: sans-serif; max-width: 600px; margin: 0 auto;\"><h1 style=\"color: #1a2332;\">Relatório Semanal</h1><table style=\"width: 100%; border-collapse: collapse; margin-top: 16px;\"><tr style=\"background: #f3f4f6;\"><td style=\"padding: 12px; font-weight: bold;\">Novos cadastros</td><td style=\"padding: 12px; text-align: right;\">' + ($json.novos_usuarios || 0) + '</td></tr><tr><td style=\"padding: 12px; font-weight: bold;\">Sessões de treino</td><td style=\"padding: 12px; text-align: right;\">' + ($json.total_sessoes || 0) + '</td></tr><tr style=\"background: #f3f4f6;\"><td style=\"padding: 12px; font-weight: bold;\">Usuários ativos</td><td style=\"padding: 12px; text-align: right;\">' + ($json.usuarios_ativos || 0) + '</td></tr><tr><td style=\"padding: 12px; font-weight: bold;\">Novos pagamentos</td><td style=\"padding: 12px; text-align: right;\">' + ($json.novos_pagamentos || 0) + '</td></tr><tr style=\"background: #f3f4f6;\"><td style=\"padding: 12px; font-weight: bold;\">Receita da semana</td><td style=\"padding: 12px; text-align: right;\">R$ ' + ($json.receita_semana || '0,00') + '</td></tr><tr><td style=\"padding: 12px; font-weight: bold;\">Taxa de conversão</td><td style=\"padding: 12px; text-align: right;\">' + ($json.taxa_conversao || '0') + '%</td></tr></table><p style=\"color: #999; font-size: 12px; margin-top: 32px;\">Relatório gerado automaticamente</p></div>' }) }}",
+        "options": {}
+      },
+      "name": "Email Relatório",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [750, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Resend API Key"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Toda Segunda 9h": {
+      "main": [
+        [{ "node": "Buscar Métricas", "type": "main", "index": 0 }]
+      ]
+    },
+    "Buscar Métricas": {
+      "main": [
+        [{ "node": "Email Relatório", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}
